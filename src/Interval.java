@@ -1,17 +1,17 @@
 
 public class Interval {
 	/*
-	*  Classe qui implemente un intervalle
-	*  int k : dimension de la feature
-	*  float b : debut
-	*  float d : fin
-	*  boolean finite : si le segment est infini ou pas 
+	*  class that implements an interval
+	*  int k : feature dim
+	*  float b : start
+	*  float d : end
+	*  boolean finite : i the interval infinite 
 	*/
 	int k;
 	float b,d;
 	boolean finite;
 	
-	//Constructeur quand on dispose de toutes les infos
+	//constructor with all information
 	Interval(int kk, float bb, float dd){
 		k=kk;
 		b=bb;
@@ -19,7 +19,7 @@ public class Interval {
 		finite = true;
 	}
 	
-	//Constructeur quand on ne dispose pas de la fin de l'intervalle
+	//constructor without the end of the interval
 	Interval(int kk,float bb){
 		k=kk;
 		b=bb;

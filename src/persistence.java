@@ -1,57 +1,34 @@
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Vector;
-
-import java.util.*;
 
 
 public class persistence {
 
-	public Vector<Simplex> F; //filtration vector. Vector is to be sorted in constructor private 
-	ArrayList<ArrayList<Integer>> M; //initial boundary matrix. 
-	int size; // F.size, number of sigma
-
-	int low(int j){
-		ArrayList<Integer> j_col=M.get(j);
-		int i = M.get(j).size()-1;
-
-		while (i >= 0){
-			if (j_col.get(i) != 0) {
-				break;
-			}
-			i--;
-		}
-
-		return i;
-	}
-
-
-	public void reduction(){
+	private Vector<Simplex> F; //filtration vector. Vector is to be sorted in constructor private 
+	private ArrayList<ArrayList<Integer>> M; //initial boundary matrix or reduced matrix
+	private int size; // F.size, number of sigma
+	
+	public persistence(String filename)throws FileNotFoundException {
+		System.out.println("Reading from " + filename + "...\n");
+		F = ReadFiltration.readFiltration(filename);
+		
+		System.out.println("Sorting filtration...\n");
+		ReadFiltration.sortSimplex(F);
 		size = F.size();
-		System.out.println(size);
-		ArrayList<Integer> lowPosition = new ArrayList<Integer>(); // position of the first(low = j)
-		for (int i =0;i<size;i++){
-			lowPosition.add(-1);
+		
+		System.out.println("Computing border matrix...");
+		computeMatrix();
+		for(int i=0; i<size; i++){
+			for(int j=0; j<size; j++)
+				System.out.print(M.get(j).get(i)+ " ");
+			System.out.println();
 		}
-		for (int i=0;i<size;i++){ // i is the indice of the column we are working on
-			ArrayList<Integer> column = M.get(i);
-			int low = low(i);  // actual low
-			if (low>-1){	// if not null column
-				if (lowPosition.get(low)>-1) { // if we already have this low we add the two columns
-					while(low>-1 && lowPosition.get(low)>-1){ 
-						for(int k =0;k<=low;k++){
-							column.set(k,(column.get(k) + M.get(lowPosition.get(low)).get(k) ) %2);
-						}
-						low=low(i);
-					}
-				}
-				if (low>-1){
-					lowPosition.set(low,i); 
-				}
-			}
-		}
+		System.out.println();
+			
 	}
-
-	public void computeMatrix(){
+	
+	private void computeMatrix(){
         int m = F.size();
         M = new ArrayList<ArrayList<Integer>>();
 
@@ -78,10 +55,57 @@ public class persistence {
         }
     }
 
-	
-	
-Vector<Interval> computeBarCode(){
+	private int low(int j){
+		ArrayList<Integer> j_col=M.get(j);
+		int i = M.get(j).size()-1;
+
+		while (i >= 0){
+			if (j_col.get(i) != 0) {
+				break;
+			}
+			i--;
+		}
+
+		return i;
+	}
+
+	public void reduction(){
+		System.out.println("Reducing matrix...");
 		
+		size = F.size();
+		ArrayList<Integer> lowPosition = new ArrayList<Integer>(); // position of the first(low = j)
+		for (int i =0;i<size;i++){
+			lowPosition.add(-1);
+		}
+		for (int i=0;i<size;i++){ // i is the indice of the column we are working on
+			ArrayList<Integer> column = M.get(i);
+			int low = low(i);  // actual low
+			if (low>-1){	// if not null column
+				if (lowPosition.get(low)>-1) { // if we already have this low we add the two columns
+					while(low>-1 && lowPosition.get(low)>-1){ 
+						for(int k =0;k<=low;k++){
+							column.set(k,(column.get(k) + M.get(lowPosition.get(low)).get(k) ) %2);
+						}
+						low=low(i);
+					}
+				}
+				if (low>-1){
+					lowPosition.set(low,i); 
+				}
+			}
+		}
+		
+		//display
+		for(int i=0; i<size; i++){
+			for(int j=0; j<size; j++)
+				System.out.print(M.get(j).get(i)+ " ");
+			System.out.println();
+		}
+		System.out.println();
+	}
+
+	public Vector<Interval> computeBarCode(){
+		System.out.println("Bar code display:");
 		Vector<Interval> bar_code = new Vector<Interval>();
 		
 		//On parcourt les colonnes
@@ -102,9 +126,8 @@ Vector<Interval> computeBarCode(){
 		for (Interval bc : bar_code){
 			System.out.println(bc);
 		}
+		System.out.println();
 		return bar_code;
 	}
-
-
 
 }

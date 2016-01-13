@@ -18,7 +18,6 @@ class Simplex {
 		val = sc.nextFloat();
 		dim = sc.nextInt();
 		vert = new TreeSet<Integer>();
-
 		for (int i=0; i<=dim; i++)
 			vert.add(sc.nextInt());
 	}
@@ -27,20 +26,33 @@ class Simplex {
 		return "{val="+val+"; dim="+dim+"; "+vert+"}\n";
 	}
 	
+}
+
+public class ReadFiltration {
+
+	static Vector<Simplex> readFiltration (String filename) throws FileNotFoundException {
+		Vector<Simplex> F = new Vector<Simplex>();
+		Scanner sc = new Scanner(new File(filename));
+		while (sc.hasNext())		
+			F.add(new Simplex(sc));
+		sc.close();
+		return F;
+	}
+	
 	static void sortSimplex(Vector<Simplex> v){
-		//On implemente un comparateur
+		//implements comparator
 		Collections.sort(v,new Comparator<Simplex>() {
 		        public int compare(Simplex  s1, Simplex s2)
 		        {
-		        	//On regarde la difference des temps
+		        	//time difference
 		        	float diff = s1.val-s2.val;
 		        	
-		        	//Si les temps sont egaux on trie par dimension
+		        	//if times are equals, we sort by dimension
 		        	if (diff == 0){
 		        		return s1.dim-s2.dim;
 		        	}
 		        	
-		        	//Sinon on renvoie la difference de temps
+		        	//else
 		        	if (diff <0){
 		        		return -1;
 		        	}
@@ -51,35 +63,6 @@ class Simplex {
 			);
 
 	}
+
 	
-}
-
-public class ReadFiltration {
-
-	static Vector<Simplex> readFiltration (String filename) throws FileNotFoundException {
-		Vector<Simplex> F = new Vector<Simplex>();
-		Scanner sc = new Scanner(new File(filename));
-		while (sc.hasNext())
-			//System.out.println("plop");			
-			F.add(new Simplex(sc));
-		sc.close();
-		return F;
-	}
-
-	public static void main(String[] args) throws FileNotFoundException {
-
-		persistence p = new persistence();
-		
-		p.F = readFiltration("filtration.txt");
-		Simplex.sortSimplex(p.F);
-		p.computeMatrix();
-		
-	
-		p.reduction();
-		
-		System.out.println(p.M);
-		
-		p.computeBarCode();
-		
-	}
 }
