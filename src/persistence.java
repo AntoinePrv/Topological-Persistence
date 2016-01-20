@@ -73,6 +73,7 @@ public class persistence {
 		System.out.println("Reducing matrix...");
 		
 		size = F.size();
+		System.out.println(size);
 		ArrayList<Integer> lowPosition = new ArrayList<Integer>(); // position of the first(low = j)
 		for (int i =0;i<size;i++){
 			lowPosition.add(-1);
@@ -104,29 +105,40 @@ public class persistence {
 		System.out.println();
 	}
 
-	public Vector<Interval> computeBarCode(){
-		System.out.println("Bar code display:");
+	Vector<Interval> computeBarCode(){
 		Vector<Interval> bar_code = new Vector<Interval>();
 		
-		//On parcourt les colonnes
+		Vector<Integer> which_column = new Vector<Integer>(M.size());
+		for(int j = 0; j < M.size() ; j++){
+			which_column.add(-1);
+		}
+		
+		for(int j = 0; j < M.size();j++){
+			if(low(j) > -1){
+				which_column.set(low(j),j);
+			}
+		}
+		
+		//going through the columns
 		for(int j = 0; j < M.size(); j++){
-			//On calcule le low
+			//calculating low
 			int l = low(j);
 			
-			//Si il n'y a pas de low, c'est que c'est un debut d'interval infini
+			//if there's no low -> start is infinite
 			if (l < 0){
-				bar_code.add(new Interval(F.get(j).dim,j));
+				if(which_column.get(j) == -1){
+					bar_code.add(new Interval(F.get(j).dim,F.get(j).val));
+				}
+				else{
+					bar_code.add(new Interval(F.get(j).dim,F.get(j).val,F.get(which_column.get(j)).val));
+				}
 			}
-			//Sinon, on a un joli segment de debut low(j) et de fin j
-			else{
-				bar_code.add(new Interval(F.get(l).dim,l,j));
-			}
+
 		}
 	
 		for (Interval bc : bar_code){
 			System.out.println(bc);
 		}
-		System.out.println();
 		return bar_code;
 	}
 
